@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>FEH Tier List Creator</title>
+  <meta name"description" content="Create your own FEH Tier List."/>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+</head>
+<body>
+  <div id="app" class="row">
+    <div id="hero-scroller" class="col s2 center-align">
+      <div id="hero-panel">
+      <div class="card-title">
+      <p>FEH Tier List Generator</p>
+      </div>
+      <div>
+        <img :src="'images/' + hero.name + '.png'"></img>
+      </div>
+      <div class="card-content">
+        <p>{{ hero.name }}<p>
+        <p>Current rank: {{ ranking }}</p>
+      </div>
+      <div>
+        <ul class="pagination">
+          <li class="active brown darken-1"><a href="#!" v-on:click="addRank(hero.name, 1)">F</a></li>
+          <li class="active blue-grey darken-1"><a href="#!" v-on:click="addRank(hero.name, 2)">D</a></li>
+          <li class="active grey darken-1"><a href="#!" v-on:click="addRank(hero.name, 3)">C</a></li>
+          <li class="active orange darken-3"><a href="#!" v-on:click="addRank(hero.name, 4)">B</a></li>
+          <li class="active grey"><a href="#!" v-on:click="addRank(hero.name, 5)">A</a></li>
+          <li class="active amber"><a href="#!" v-on:click="addRank(hero.name, 6)">S</a></li>
+          <li class="active pink lighten-3"><a href="#!" v-on:click="addRank(hero.name, 7)">SS</a></li>
+        </ul>
+      </div>
+        <a class="btn" v-on:click="decrementIndex">Back</a>
+        <a class="btn" v-on:click="incrementIndex">Skip</a>
+      </div>
+      <div>
+        <p>Progress: {{ rankCount }}/{{ hero_list.length }}</p>
+      </div>
+  </div>
+  <div id="grid" class="col s10">
+    <table class="bordered centered">
+      <thead>
+        <th>Rating</th>
+        <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
+      </thead>
+      <tbody>
+        <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
+          <td>{{rank}}</td>
+          <td v-for="weapon in weapontypes" :id="rank + '-' + weapon">
+            <div>
+              <a href="#!" v-on:click="selectHero">
+                <img :id="hero.name" style="width: 36px; height: 36px"
+                  v-for="hero in getRankedHeroes(weapon, rank)"
+                  :src="'images/' + hero.name + '.png'">
+                </img>
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+<script src="hero_data.js"></script>
+<script>
+  heroes.forEach(function(hero) {
+    hero.rating = 0
+    hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+hero.weapontype : hero.weapontype
+  })
+  heroes = heroes.filter(hero=> !hero.name.includes('generic'))
+ 
+  new Vue({
+    el: '#app',
+    data: {
+      hero_list: heroes,
+      hero_index: Math.floor(Math.random()*heroes.length),
+      rankings: ['Unranked','F', 'D', 'C', 'B', 'A', 'S', 'SS'],
+      weapontypes: ['sword', 'redtome', 'reddragon', 'lance', 'bluetome', 'bluedragon', 'axe', 'greentome', 'greendragon', 'bow', 'dagger', 'staff']
+    },
+    computed: {
+      hero: function () {
+        return this.hero_list[this.hero_index]
+      },
+      ranking: function () {
+        return this.rankings[this.hero_list[this.hero_index].rating]
+      },
+      rankCount: function () {
+        return this.hero_list.map(hero=>hero.rating).filter(rating => rating > 0).length
+      }
+    },
+    methods: {
+      incrementIndex: function(event) {
+        this.hero_index += 1
+        if(this.hero_index >= this.hero_list.length) this.hero_index = 0
+      },
+      decrementIndex: function(event) {
+        this.hero_index -= 1
+        if(this.hero_index < 0) this.hero_index = this.hero_list.length-1
+      },
+      addRank: function(name, rating) {
+        this.hero_list.find(hero=>hero.name === name).rating = rating
+        this.incrementIndex()
+      },
+      getRankedHeroes: function(weapontype, rank) {
+        return this.hero_list.filter(hero=> hero.weapontype == weapontype && hero.rating == this.rankings.indexOf(rank))
+      },
+      selectHero: function(event) {
+        name = event.target.id
+        this.hero_index = this.hero_list.map(hero=>hero.name).indexOf(name)
+      }
+    }
+  })
+</script>
+
+</html>
