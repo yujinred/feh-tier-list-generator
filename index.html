@@ -1,118 +1,256 @@
 <!doctype html>
 <html>
 
-<head>
-  <title>FEH Tier List Creator</title>
-  <meta name"description" content="Create your own FEH Tier List."/>
-  <script src="https://unpkg.com/vue"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-</head>
-<body>
-  <div id="app" class="row">
-    <div id="hero-scroller" class="col s2 center-align">
-      <div id="hero-panel">
-      <div class="card-title">
-      <p>FEH Tier List Generator</p>
-      </div>
-      <div>
-        <img :src="'images/' + hero.name + '.png'"></img>
-      </div>
-      <div class="card-content">
-        <p>{{ hero.name }}<p>
-        <p>Current rank: {{ ranking }}</p>
-      </div>
-      <div>
-        <ul class="pagination">
-          <li class="active brown darken-1"><a href="#!" v-on:click="addRank(hero.name, 1)">F</a></li>
-          <li class="active blue-grey darken-1"><a href="#!" v-on:click="addRank(hero.name, 2)">D</a></li>
-          <li class="active grey darken-1"><a href="#!" v-on:click="addRank(hero.name, 3)">C</a></li>
-          <li class="active orange darken-3"><a href="#!" v-on:click="addRank(hero.name, 4)">B</a></li>
-          <li class="active grey"><a href="#!" v-on:click="addRank(hero.name, 5)">A</a></li>
-          <li class="active amber"><a href="#!" v-on:click="addRank(hero.name, 6)">S</a></li>
-          <li class="active pink lighten-3"><a href="#!" v-on:click="addRank(hero.name, 7)">SS</a></li>
-        </ul>
-      </div>
-        <a href="#!" class="btn" v-on:click="decrementIndex">Back</a>
-        <a href="#!" class="btn" v-on:click="incrementIndex">Skip</a>
-      </div>
-      <div>
-        <p>Progress: {{ rankCount }}/{{ hero_list.length }}</p>
-      </div>
-  </div>
-  <div id="grid" class="col s10">
-    <table class="bordered centered">
-      <thead>
-        <th>Rating</th>
-        <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
-      </thead>
-      <tbody>
-        <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
-          <td>{{rank}}</td>
-          <td v-for="weapon in weapontypes" :id="rank + '-' + weapon">
+  <head>
+    <title>FEH Tier List Creator</title>
+    <meta name"description" content="Create your own FEH Tier List."/>
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"/>
+    <script
+                           src="https://code.jquery.com/jquery-3.1.1.min.js"
+                           integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+                           crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <div id="app" class="ui stackable grid" style="margin: 1em;">
+        <div id="hero-scroller" class="three wide computer fourteen wide tablet column centered">
+          <div id="hero-panel" class="ui center aligned header">
+            <div class="ui header">FEH Tier List Generator</div>
             <div>
-              <a href="#!" v-on:click="selectHero">
-                <img :id="hero.name" style="width: 36px; height: 36px"
-                  v-for="hero in getRankedHeroes(weapon, rank)"
-                  :src="'images/' + hero.name + '.png'">
-                </img>
-              </a>
+              <img :src="'images/' + hero.name + '.png'"></img>
             </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</body>
+            <div>
+              <div class="ui one header">{{ hero.name }}</div>
+              <div class="ui five mini statistics">
+                <div class="grey statistic">
+                  <div class="value">
+                    {{ hero.maxhp || hero.basehp + growthvalues[hero.hpgrowth]}}
+                  </div>
+                  <div class="label">
+                    HP
+                  </div>
+                </div>
+                <div class="red statistic">
+                  <div class="value">
+                    {{ hero.maxatk || hero.baseatk + growthvalues[hero.atkgrowth] }}
+                  </div>
+                  <div class="label">
+                    Atk
+                  </div>
+                </div>
+                <div class="green statistic">
+                  <div class="value">
+                    {{ hero.maxspd || hero.basespd + growthvalues[hero.spdgrowth]}}
+                  </div>
+                  <div class="label">
+                    Spd
+                  </div>
+                </div>
+                <div class="orange statistic">
+                  <div class="value">
+                    {{ hero.maxdef || hero.basedef + growthvalues[hero.defgrowth]}}
+                  </div>
+                  <div class="label">
+                    Def
+                  </div>
+                </div>
+                <div class="blue statistic">
+                  <div class="value">
+                    {{ hero.maxres || hero.baseres + growthvalues[hero.resgrowth]}}
+                  </div>
+                  <div class="label">
+                    Res
+                  </div>
+                </div>
+              </div>
+              <div class="ui divider"></div>
+              <div>
+                <p>Current rank: {{ ranking }}</p>
+                <div class="seven ui buttons">
+                  <button class="ui button" v-on:click="addRank(hero.name, 1)">F</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 2)">D</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 3)">C</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 4)">B</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 5)">A</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 6)">S</button>
+                  <button class="ui button" v-on:click="addRank(hero.name, 7)">SS</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ui divider"></div>
 
-<script src="hero_data.js"></script>
-<script>
-  heroes.forEach(function(hero) {
-    hero.rating = 0
-    hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+hero.weapontype : hero.weapontype
-  })
-  heroes = heroes.filter(hero=> !hero.name.includes('generic'))
- 
-  new Vue({
-    el: '#app',
-    data: {
-      hero_list: heroes,
-      hero_index: Math.floor(Math.random()*heroes.length),
-      rankings: ['Unranked','F', 'D', 'C', 'B', 'A', 'S', 'SS'],
-      weapontypes: ['sword', 'redtome', 'reddragon', 'lance', 'bluetome', 'bluedragon', 'axe', 'greentome', 'greendragon', 'bow', 'dagger', 'staff']
+          <div class="ui form">
+            <div class="three fields">
+              <div class="field">
+                <label>Color</label>
+                <select v-model="selectedColor">
+                  <option selected value="">All</option>
+                  <option>Red</option>
+                  <option>Blue</option>
+                  <option>Green</option>
+                  <option>Gray</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Weapon</label>
+                <select v-model="selectedWeapon">
+                  <option selected value="">All</option>
+                  <option>Sword</option>
+                  <option>Lance</option>
+                  <option>Axe</option>
+                  <option>Red Tome</option>
+                  <option>Blue Tome</option>
+                  <option>Green Tome</option>
+                  <option>Bow</option>
+                  <option>Dagger</option>
+                  <option>Staff</option>
+                  <option>Breath</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Movement</label>
+                <select v-model="selectedMovement">
+                  <option selected value="">All</option>
+                  <option>Infantry</option>
+                  <option>Cavalry</option>
+                  <option>Flying</option>
+                  <option>Armor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div style="height: 300px;">
+            <div class="ui selection list" style="height: 100%; overflow: scroll;">
+
+              <div :name="hero.name" class="item" v-for="hero in hero_list" v-on:click.stop="selectHero">
+                <div class="right floated content" v-if="hero.rating > 0">
+                  <i class="checkmark icon"></i>
+                </div>
+                <img class="ui avatar image" :src="'images/' + hero.name + '.png'">
+                <div class="content">
+                  <div class="header">{{ hero.name }}</div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p>Progress: {{ rankCount }}/{{ all_heroes.length }}</p>
+          </div>
+          <button class="ui basic button" v-on:click="randomize()">
+            <i class="icon random"></i>
+            Randomize
+          </button>
+          <button class="ui basic button" v-on:click="reset()">
+            <i class="icon erase"></i>
+            Reset
+          </button>
+        </div>
+        <div id="grid" class="thirteen wide computer fourteen wide tablet column">
+          <table class="ui celled table" style="min-height: 900px;">
+            <thead>
+              <th>Rating</th>
+              <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
+            </thead>
+            <tbody>
+              <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
+                <td>{{rank}}</td>
+                <td v-for="weapon in weapontypes" :id="rank + '-' + weapon">
+                  <div>
+                    <a href="#!" v-on:click="selectHero">
+                      <img :name="hero.name" style="width: 36px; height: 36px"
+                                             v-for="hero in getRankedHeroes(weapon, rank)"
+                                             :src="'images/' + hero.name + '.png'">
+                      </img>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </body>
+
+  <script src="hero_data.js"></script>
+  <script>
+heroes.forEach(function(hero) {
+  hero.rating = 0
+    hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+"breath" : hero.weapontype
+})
+heroes = heroes.filter(hero=> !hero.name.includes('generic'))
+
+new Vue({
+  el: '#app',
+  data: {
+    all_heroes: heroes,
+    hero_index: Math.floor(Math.random()*heroes.length),
+    rankings: ['Unranked','F', 'D', 'C', 'B', 'A', 'S', 'SS'],
+    weapontypes: ['sword', 'redtome', 'redbreath', 'lance', 'bluetome', 'bluebreath', 'axe', 'greentome', 'greenbreath', 'bow', 'dagger', 'staff'],
+    growthvalues: [8,10,13,15,17,19,22,24,26,28,30,33,35,37],
+    selectedColor: "",
+    selectedWeapon: "",
+    selectedMovement: "",
+  },
+  computed: {
+    hero: function () {
+      return this.all_heroes[this.hero_index]
     },
-    computed: {
-      hero: function () {
-        return this.hero_list[this.hero_index]
-      },
-      ranking: function () {
-        return this.rankings[this.hero_list[this.hero_index].rating]
-      },
-      rankCount: function () {
-        return this.hero_list.map(hero=>hero.rating).filter(rating => rating > 0).length
-      }
+    ranking: function () {
+      return this.rankings[this.hero.rating]
     },
-    methods: {
-      incrementIndex: function(event) {
-        this.hero_index += 1
-        if(this.hero_index >= this.hero_list.length) this.hero_index = 0
-      },
-      decrementIndex: function(event) {
-        this.hero_index -= 1
-        if(this.hero_index < 0) this.hero_index = this.hero_list.length-1
-      },
-      addRank: function(name, rating) {
-        this.hero_list.find(hero=>hero.name === name).rating = rating
+    rankCount: function () {
+      return this.all_heroes.map(hero=>hero.rating).filter(rating => rating > 0).length
+    },
+    hero_list: function() {
+      return this.all_heroes
+        .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
+        .filter(hero => hero.weapontype.includes(this.selectedWeapon.replace(/\s+/g, '').toLowerCase()))
+        .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
+        .filter(hero => hero.rating == 0)
+    },
+  },
+  methods: {
+    incrementIndex: function(event) {
+      curHeroName = this.all_heroes[this.hero_index].name
+        nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)+1
+        if (nextHeroListIndex >= this.hero_list.length) { nextHeroListIndex = 0 }
+      nextHeroName = this.hero_list[nextHeroListIndex].name
+        this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
+    },
+    decrementIndex: function(event) {
+      curHeroName = this.all_heroes[this.hero_index].name
+        nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)-1
+        if (nextHeroListIndex < 0) { nextHeroListIndex = this.hero_list.length - 1 }
+      nextHeroName = this.hero_list[nextHeroListIndex].name
+        this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
+    },
+    addRank: function(name, rating) {
+      this.all_heroes.find(hero=>hero.name === name).rating = rating
         this.incrementIndex()
-      },
-      getRankedHeroes: function(weapontype, rank) {
-        return this.hero_list.filter(hero=> hero.weapontype == weapontype && hero.rating == this.rankings.indexOf(rank))
-      },
-      selectHero: function(event) {
-        name = event.target.id
-        this.hero_index = this.hero_list.map(hero=>hero.name).indexOf(name)
-      }
+    },
+    getRankedHeroes: function(weapontype, rank) {
+      return this.all_heroes.filter(hero=> hero.weapontype == weapontype && hero.rating == this.rankings.indexOf(rank))
+    },
+    randomize: function() {
+      this.all_heroes.forEach(function(hero) {
+        hero.rating = Math.floor(Math.random()*7)+1
+      })
+    },
+    reset: function (){
+      this.all_heroes.forEach(function(hero) {
+        hero.rating = 0
+      })
+    },
+    selectHero: function(event) {
+      name = event.target.getAttribute('name')
+        this.hero_index = this.all_heroes.map(hero=>hero.name).indexOf(name)
     }
-  })
-</script>
+  }
+})
+  </script>
 
 </html>
