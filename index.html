@@ -215,17 +215,16 @@ new Vue({
   },
   methods: {
     incrementIndex: function(event) {
+      if(this.hero_list.length == 0) return
       curHeroName = this.all_heroes[this.hero_index].name
-      console.log(curHeroName)
-      console.log(this.hero_list.map(hero => hero.name))
       nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)+1
-      console.log(nextHeroListIndex)
       if (nextHeroListIndex >= this.hero_list.length) { nextHeroListIndex = 0 }
       nextHeroName = this.hero_list[nextHeroListIndex].name
       console.log(nextHeroName)
       this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
     },
     decrementIndex: function(event) {
+      if(this.hero_list.length == 0) return
       curHeroName = this.all_heroes[this.hero_index].name
       nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)-1
       if (nextHeroListIndex < 0) { nextHeroListIndex = this.hero_list.length - 1 }
