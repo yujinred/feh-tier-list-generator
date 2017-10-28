@@ -216,33 +216,37 @@ new Vue({
   methods: {
     incrementIndex: function(event) {
       curHeroName = this.all_heroes[this.hero_index].name
-        nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)+1
-        if (nextHeroListIndex >= this.hero_list.length) { nextHeroListIndex = 0 }
+      console.log(curHeroName)
+      console.log(this.hero_list.map(hero => hero.name))
+      nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)+1
+      console.log(nextHeroListIndex)
+      if (nextHeroListIndex >= this.hero_list.length) { nextHeroListIndex = 0 }
       nextHeroName = this.hero_list[nextHeroListIndex].name
-        this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
+      console.log(nextHeroName)
+      this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
     },
     decrementIndex: function(event) {
       curHeroName = this.all_heroes[this.hero_index].name
-        nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)-1
-        if (nextHeroListIndex < 0) { nextHeroListIndex = this.hero_list.length - 1 }
+      nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)-1
+      if (nextHeroListIndex < 0) { nextHeroListIndex = this.hero_list.length - 1 }
       nextHeroName = this.hero_list[nextHeroListIndex].name
-        this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
+      this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
     },
     addRank: function(name, rating) {
+      this.incrementIndex()
       this.all_heroes.find(hero=>hero.name === name).rating = rating
-        this.incrementIndex()
     },
     getRankedHeroes: function(weapontype, rank) {
       return this.all_heroes.filter(hero=> hero.weapontype == weapontype && hero.rating == this.rankings.indexOf(rank))
     },
     randomize: function() {
       this.all_heroes.forEach(function(hero) {
-        hero.rating = Math.floor(Math.random()*7)+1
+      hero.rating = Math.floor(Math.random()*7)+1
       })
     },
     reset: function (){
       this.all_heroes.forEach(function(hero) {
-        hero.rating = 0
+      hero.rating = 0
       })
     },
     selectHero: function(event) {
