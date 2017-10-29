@@ -123,7 +123,7 @@
             </div>
           </div>
           <div style="height: 300px;">
-            <div class="ui selection list" style="height: 100%; overflow: scroll;">
+            <div class="ui selection list" style="height: 100%; overflow-y: scroll;">
 
               <div :name="hero.name" class="item" v-for="hero in hero_list" v-on:click.stop="selectHero">
                 <div class="right floated content" v-if="hero.rating > 0">
