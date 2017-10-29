@@ -15,7 +15,7 @@
   <body>
     <div>
       <div id="app" class="ui stackable grid" style="padding: 1em;">
-        <div id="hero-scroller" class="three wide computer fourteen wide tablet column centered">
+        <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered">
           <div id="hero-panel" class="ui center aligned header">
             <div class="ui header">FEH Tier List Generator</div>
             <div>
@@ -68,7 +68,7 @@
               <div class="ui divider"></div>
               <div>
                 <p>Current rank: {{ ranking }}</p>
-                <div class="seven ui buttons">
+                <div class="seven icon ui buttons">
                   <button class="ui button" v-on:click="addRank(hero.name, 1)">F</button>
                   <button class="ui button" v-on:click="addRank(hero.name, 2)">D</button>
                   <button class="ui button" v-on:click="addRank(hero.name, 3)">C</button>
@@ -148,7 +148,7 @@
             Reset
           </button>
         </div>
-        <div id="grid" class="thirteen wide computer fourteen wide tablet column">
+        <div id="grid" class="twelve wide computer fourteen wide tablet column">
           <table class="ui celled table center aligned" style="min-height: 900px;">
             <thead>
               <th>Rating</th>
