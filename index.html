@@ -14,7 +14,7 @@
   </head>
   <body>
     <div>
-      <div id="app" class="ui stackable grid" style="margin: 1em;">
+      <div id="app" class="ui stackable grid" style="padding: 1em;">
         <div id="hero-scroller" class="three wide computer fourteen wide tablet column centered">
           <div id="hero-panel" class="ui center aligned header">
             <div class="ui header">FEH Tier List Generator</div>
@@ -124,21 +124,20 @@
           </div>
           <div style="height: 300px;">
             <div class="ui selection list" style="height: 100%; overflow-y: scroll;">
-
-              <div :name="hero.name" class="item" v-for="hero in hero_list" v-on:click.stop="selectHero">
-                <div class="right floated content" v-if="hero.rating > 0">
+              <div :name="unit.name" class="item" v-for="unit in hero_list" v-on:click.stop="selectHero(unit.name)">
+                <div class="right floated content" v-if="unit.rating > 0">
                   <i class="checkmark icon"></i>
                 </div>
-                <img class="ui avatar image" :src="'images/' + hero.name + '.png'">
+                <img class="ui avatar image" :src="'images/' + unit.name + '.png'">
                 <div class="content">
-                  <div class="header">{{ hero.name }}</div>
+                  <div class="header">{{ unit.name }}</div>
 
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <p>Progress: {{ rankCount }}/{{ all_heroes.length }}</p>
+            <label>Progress: {{ rankCount }}/{{ all_heroes.length }}</label>
           </div>
           <button class="ui basic button" v-on:click="randomize()">
             <i class="icon random"></i>
@@ -159,11 +158,10 @@
               <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
                 <td>{{rank}}</td>
                 <td v-for="weapon in weapontypes" :id="rank + '-' + weapon" style="padding: 0">
-                  <div>
-                    <a href="#!" v-on:click="selectHero">
-                      <img :name="hero.name" style="width: 36px; height: 36px"
-                                             v-for="hero in getRankedHeroes(weapon, rank)"
-                                             :src="'images/' + hero.name + '.png'">
+                  <div v-for="unit in getRankedHeroes(weapon, rank)">
+                    <a href="#!" v-on:click="selectHero(unit.name)">
+                      <img :name="unit.name" style="width: 36px; height: 36px"
+                                             :src="'images/' + unit.name + '.png'">
                       </img>
                     </a>
                   </div>
@@ -248,8 +246,7 @@ new Vue({
       hero.rating = 0
       })
     },
-    selectHero: function(event) {
-      name = event.target.getAttribute('name')
+    selectHero: function(name) {
         this.hero_index = this.all_heroes.map(hero=>hero.name).indexOf(name)
     }
   }
