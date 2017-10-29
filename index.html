@@ -158,12 +158,16 @@
               <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
                 <td>{{rank}}</td>
                 <td v-for="weapon in weapontypes" :id="rank + '-' + weapon" style="padding: 0">
-                  <div v-for="unit in getRankedHeroes(weapon, rank)">
-                    <a href="#!" v-on:click="selectHero(unit.name)">
+                  <div>
+                  <div >
+                    <a href="#!" v-on:click="selectHero(unit.name)"
+                      v-for="unit in getRankedHeroes(weapon, rank)"
+>
                       <img :name="unit.name" style="width: 36px; height: 36px"
                                              :src="'images/' + unit.name + '.png'">
                       </img>
                     </a>
+                  </div>
                   </div>
                 </td>
               </tr>
