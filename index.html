@@ -122,7 +122,7 @@
               </div>
             </div>
           </div>
-          <div style="height: 300px;">
+          <div style="height: 300px;" v-show="!importing && !exporting">
             <div class="ui selection list" style="height: 100%; overflow-y: scroll;">
               <div :name="unit.name" class="item" v-for="unit in hero_list" v-on:click.stop="selectHero(unit.name)">
                 <div class="right floated content" v-if="unit.rating > 0">
@@ -136,23 +136,61 @@
               </div>
             </div>
           </div>
+          <div style="height: 300px;" v-show="exporting">
+            <div class="ui form">
+              <div class="field">
+                <label>Copy text from here</label>
+                <textarea readonly rows="14"> {{ rankToText }}</textarea>
+              </div>
+            </div>
+          </div>
+          <div style="height: 300px;" v-show="importing">
+            <div class="ui form">
+              <div class="field">
+                <label>Paste text here</label>
+                <textarea rows="14" @input="textToRank($event.target.value)"></textarea>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label>Progress: {{ rankCount }}/{{ all_heroes.length }}</label>
           </div>
-          <button class="ui basic button" v-on:click="randomize()">
+          <div class="ui divider"></div>
+          <div class="ui four buttons">
+          <button class="ui button" v-on:click="randomize()">
             <i class="icon random"></i>
             Randomize
           </button>
-          <button class="ui basic button" v-on:click="reset()">
+          <button class="ui button" v-on:click="reset()">
             <i class="icon erase"></i>
             Reset
           </button>
+
+            <button class="ui button" v-if="!importing" v-on:click="importing = !importing; exporting = false">
+              <i class="icon paste"></i>
+              Import
+            </button>
+            <button class="ui button" v-else v-on:click="importing = false; exporting = false">
+              <i class="icon list"></i>
+              List
+            </button>
+            <button class="ui button" v-if="!exporting" v-on:click="exporting = !exporting; importing = false">
+              <i class="icon copy"></i>
+              Export
+            </button>
+            <button class="ui button" v-else v-on:click="importing = false; exporting = false">
+              <i class="icon list"></i>
+              List
+            </button>
+          </div>
+
         </div>
         <div id="grid" class="twelve wide computer fourteen wide tablet column">
           <table class="ui celled table center aligned" style="min-height: 900px;">
             <thead>
-              <th style="width: calc(100% / 13)">Rating</th>
-              <th  style="width: calc(100% / 13)" v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
+              <th>Rating</th>
+              <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
             </thead>
             <tbody>
               <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
@@ -175,6 +213,8 @@
           </table>
         </div>
       </div>
+
+
   </body>
 
   <script src="hero_data.js"></script>
@@ -184,6 +224,8 @@ heroes.forEach(function(hero) {
     hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+"breath" : hero.weapontype
 })
 heroes = heroes.filter(hero=> !hero.name.includes('generic'))
+
+$('.ui.modal').modal();
 
 new Vue({
   el: '#app',
@@ -196,6 +238,8 @@ new Vue({
     selectedColor: "",
     selectedWeapon: "",
     selectedMovement: "",
+    importing: false,
+    exporting: false,
   },
   computed: {
     hero: function () {
@@ -213,6 +257,10 @@ new Vue({
         .filter(hero => hero.weapontype.includes(this.selectedWeapon.replace(/\s+/g, '').toLowerCase()))
         .filter(hero => hero.movetype.includes(this.selectedMovement.toLowerCase()))
         .filter(hero => hero.rating == 0)
+    },
+    rankToText: function () {
+      ratings = this.all_heroes.map(hero => ({name: hero.name, rating: hero.rating}))
+      return JSON.stringify(ratings)
     },
   },
   methods: {
@@ -241,8 +289,9 @@ new Vue({
       return this.all_heroes.filter(hero=> hero.weapontype == weapontype && hero.rating == this.rankings.indexOf(rank))
     },
     randomize: function() {
+      length = this.rankings.length - 1
       this.all_heroes.forEach(function(hero) {
-      hero.rating = Math.floor(Math.random()*this.rankings.length)+1
+      hero.rating = Math.floor(Math.random()*length)+1
       })
     },
     reset: function (){
@@ -250,8 +299,20 @@ new Vue({
       hero.rating = 0
       })
     },
+    showImport: function (){
+      $('.ui.modal').modal('toggle')
+    },
     selectHero: function(name) {
         this.hero_index = this.all_heroes.map(hero=>hero.name).indexOf(name)
+    },
+    textToRank: function (text) {
+      try {
+        ratings = JSON.parse(text)
+        ratings.forEach(rate => { this.all_heroes.find(hero=> hero.name == rate.name).rating = rate.rating })
+      }
+      catch (err) {
+
+      }
     }
   }
 })
