@@ -7,9 +7,9 @@
     <script src="https://unpkg.com/vue"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"/>
     <script
-                           src="https://code.jquery.com/jquery-3.1.1.min.js"
-                           integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-                           crossorigin="anonymous"></script>
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
   </head>
   <body>
@@ -69,19 +69,18 @@
               <div>
                 <p>Current rank: {{ ranking }}</p>
                 <div class="eight icon ui buttons">
-                  <button class="ui button" v-on:click="addRank(hero.name, 1)">D</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 2)">C</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 3)">B</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 4)">A</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 5)">A+</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 6)">S-</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 7)">S</button>
-                  <button class="ui button" v-on:click="addRank(hero.name, 8)">S+</button>
+                  <button class="ui button"
+                    v-for="rank in rankings.slice(1,rankings.length)"
+                    v-on:click="addRank(hero.name, rankings.indexOf(rank))">
+                    {{ rank }}</button>
                 </div>
               </div>
             </div>
           </div>
+
+          <!---------------------------------------------------------------->
           <div class="ui divider"></div>
+          <!---------------------------------------------------------------->
 
           <div class="ui form">
             <div class="three fields">
@@ -152,8 +151,8 @@
         <div id="grid" class="twelve wide computer fourteen wide tablet column">
           <table class="ui celled table center aligned" style="min-height: 900px;">
             <thead>
-              <th>Rating</th>
-              <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
+              <th style="width: calc(100% / 13)">Rating</th>
+              <th  style="width: calc(100% / 13)" v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
             </thead>
             <tbody>
               <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
@@ -212,7 +211,7 @@ new Vue({
       return this.all_heroes
         .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
         .filter(hero => hero.weapontype.includes(this.selectedWeapon.replace(/\s+/g, '').toLowerCase()))
-        .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
+        .filter(hero => hero.movetype.includes(this.selectedMovement.toLowerCase()))
         .filter(hero => hero.rating == 0)
     },
   },
@@ -243,7 +242,7 @@ new Vue({
     },
     randomize: function() {
       this.all_heroes.forEach(function(hero) {
-      hero.rating = Math.floor(Math.random()*8)+1
+      hero.rating = Math.floor(Math.random()*this.rankings.length)+1
       })
     },
     reset: function (){
