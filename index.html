@@ -15,7 +15,8 @@
 
 <body>
   <div id="app" class="ui stackable grid" style="padding: 1em;">
-    <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered">
+    <!-- Start of sidebar -->
+    <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered" v-show="!expanded">
       <div id="hero-panel" class="ui center aligned header">
         <div class="ui header">FEH Tier List Generator</div>
         <div>
@@ -193,10 +194,10 @@
     <!-- End of side bar -->
 
     <!-- Start of Table -->
-    <div id="grid" class="twelve wide computer fourteen wide tablet column centered">
+    <div id="grid" class="column centered" :class="!expanded ? 'twelve wide computer fourteen wide tablet' : 'sixteen wide computer sixteen wide tablet'">
       <table class="ui celled table center aligned" style="min-height: 900px;">
         <thead>
-          <th>Rating</th>
+          <th>Rating<br><a v-on:click="expanded = !expanded" href="#"><i :class="!expanded ? 'expand icon' : 'compress icon'"></i></a></th>
           <th v-for="weapon in weapontypes">
             <img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img>
           </th>
@@ -238,6 +239,7 @@ new Vue({
     selectedMovement: "",
     importing: false,
     exporting: false,
+    expanded: false,
   },
   computed: {
     hero: function () {
