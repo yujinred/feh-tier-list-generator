@@ -1,231 +1,229 @@
 <!doctype html>
 <html>
 
-  <head>
-    <title>FEH Tier List Creator</title>
-    <meta name"description" content="Create your own FEH Tier List."/>
-    <script src="https://unpkg.com/vue"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"/>
-    <script
-      src="https://code.jquery.com/jquery-3.1.1.min.js"
-      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-      crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
-  </head>
-  <body>
-    <div>
-      <div id="app" class="ui stackable grid" style="padding: 1em;">
-        <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered">
-          <div id="hero-panel" class="ui center aligned header">
-            <div class="ui header">FEH Tier List Generator</div>
-            <div>
-              <img :src="'images/' + hero.name + '.png'"></img>
-            </div>
-            <div>
-              <div class="ui one header">{{ hero.name }}</div>
-              <div class="ui five mini statistics">
-                <div class="grey statistic">
-                  <div class="value">
-                    {{ hero.maxhp || hero.basehp + growthvalues[hero.hpgrowth]}}
-                  </div>
-                  <div class="label">
-                    HP
-                  </div>
-                </div>
-                <div class="red statistic">
-                  <div class="value">
-                    {{ hero.maxatk || hero.baseatk + growthvalues[hero.atkgrowth] }}
-                  </div>
-                  <div class="label">
-                    Atk
-                  </div>
-                </div>
-                <div class="green statistic">
-                  <div class="value">
-                    {{ hero.maxspd || hero.basespd + growthvalues[hero.spdgrowth]}}
-                  </div>
-                  <div class="label">
-                    Spd
-                  </div>
-                </div>
-                <div class="orange statistic">
-                  <div class="value">
-                    {{ hero.maxdef || hero.basedef + growthvalues[hero.defgrowth]}}
-                  </div>
-                  <div class="label">
-                    Def
-                  </div>
-                </div>
-                <div class="blue statistic">
-                  <div class="value">
-                    {{ hero.maxres || hero.baseres + growthvalues[hero.resgrowth]}}
-                  </div>
-                  <div class="label">
-                    Res
-                  </div>
-                </div>
-              </div>
-              <div class="ui divider"></div>
-              <div>
-                <p>Current rank: {{ ranking }}</p>
-                <div class="eight icon ui buttons">
-                  <button class="ui button"
-                    v-for="rank in rankings.slice(1,rankings.length)"
-                    v-on:click="addRank(hero.name, rankings.indexOf(rank))">
-                    {{ rank }}</button>
-                </div>
-              </div>
-            </div>
-          </div>
+<head>
+  <title>FEH Tier List Creator</title>
+  <meta name"description" content="Create your own FEH Tier List."/>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"/>
+  <script
+                         src="https://code.jquery.com/jquery-3.1.1.min.js"
+                         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+                         crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+</head>
 
-          <!---------------------------------------------------------------->
-          <div class="ui divider"></div>
-          <!---------------------------------------------------------------->
-
-          <div class="ui form">
-            <div class="three fields">
-              <div class="field">
-                <label>Color</label>
-                <select v-model="selectedColor">
-                  <option selected value="">All</option>
-                  <option>Red</option>
-                  <option>Blue</option>
-                  <option>Green</option>
-                  <option>Gray</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Weapon</label>
-                <select v-model="selectedWeapon">
-                  <option selected value="">All</option>
-                  <option>Sword</option>
-                  <option>Lance</option>
-                  <option>Axe</option>
-                  <option>Red Tome</option>
-                  <option>Blue Tome</option>
-                  <option>Green Tome</option>
-                  <option>Bow</option>
-                  <option>Dagger</option>
-                  <option>Staff</option>
-                  <option>Breath</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Movement</label>
-                <select v-model="selectedMovement">
-                  <option selected value="">All</option>
-                  <option>Infantry</option>
-                  <option>Cavalry</option>
-                  <option>Flying</option>
-                  <option>Armor</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div style="height: 300px;" v-show="!importing && !exporting">
-            <div class="ui selection list" style="height: 100%; overflow-y: scroll;">
-              <div :name="unit.name" class="item" v-for="unit in hero_list" v-on:click.stop="selectHero(unit.name)">
-                <div class="right floated content" v-if="unit.rating > 0">
-                  <i class="checkmark icon"></i>
-                </div>
-                <img class="ui avatar image" :src="'images/' + unit.name + '.png'">
-                <div class="content">
-                  <div class="header">{{ unit.name }}</div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <div style="height: 300px;" v-show="exporting">
-            <div class="ui form">
-              <div class="field">
-                <label>Copy text from here</label>
-                <textarea readonly rows="14"> {{ rankToText }}</textarea>
-              </div>
-            </div>
-          </div>
-          <div style="height: 300px;" v-show="importing">
-            <div class="ui form">
-              <div class="field">
-                <label>Paste text here</label>
-                <textarea rows="14" @input="textToRank($event.target.value)"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label>Progress: {{ rankCount }}/{{ all_heroes.length }}</label>
-          </div>
-          <div class="ui divider"></div>
-          <div class="ui four buttons">
-          <button class="ui button" v-on:click="randomize()">
-            <i class="icon random"></i>
-            Randomize
-          </button>
-          <button class="ui button" v-on:click="reset()">
-            <i class="icon erase"></i>
-            Reset
-          </button>
-
-            <button class="ui button" v-if="!importing" v-on:click="importing = !importing; exporting = false">
-              <i class="icon paste"></i>
-              Import
-            </button>
-            <button class="ui button" v-else v-on:click="importing = false; exporting = false">
-              <i class="icon list"></i>
-              List
-            </button>
-            <button class="ui button" v-if="!exporting" v-on:click="exporting = !exporting; importing = false">
-              <i class="icon copy"></i>
-              Export
-            </button>
-            <button class="ui button" v-else v-on:click="importing = false; exporting = false">
-              <i class="icon list"></i>
-              List
-            </button>
-          </div>
-
+<body>
+  <div id="app" class="ui stackable grid" style="padding: 1em;">
+    <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered">
+      <div id="hero-panel" class="ui center aligned header">
+        <div class="ui header">FEH Tier List Generator</div>
+        <div>
+          <img :src="'images/' + hero.name + '.png'"></img>
         </div>
-        <div id="grid" class="twelve wide computer fourteen wide tablet column">
-          <table class="ui celled table center aligned" style="min-height: 900px;">
-            <thead>
-              <th>Rating</th>
-              <th v-for="weapon in weapontypes"><img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img></th>
-            </thead>
-            <tbody>
-              <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
-                <td>{{rank}}</td>
-                <td v-for="weapon in weapontypes" :id="rank + '-' + weapon" style="padding: 0">
-                  <div>
-                  <div >
-                    <a href="#!" v-on:click="selectHero(unit.name)"
-                      v-for="unit in getRankedHeroes(weapon, rank)"
->
-                      <img :name="unit.name" style="width: 36px; height: 36px"
-                                             :src="'images/' + unit.name + '.png'">
-                      </img>
-                    </a>
-                  </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div>
+          <div class="ui one header">{{ hero.name }}</div>
+          <div class="ui five mini statistics">
+            <div class="grey statistic">
+              <div class="value">
+                {{ hero.maxhp || hero.basehp + growthvalues[hero.hpgrowth]}}
+              </div>
+              <div class="label">
+                HP
+              </div>
+            </div>
+            <div class="red statistic">
+              <div class="value">
+                {{ hero.maxatk || hero.baseatk + growthvalues[hero.atkgrowth] }}
+              </div>
+              <div class="label">
+                Atk
+              </div>
+            </div>
+            <div class="green statistic">
+              <div class="value">
+                {{ hero.maxspd || hero.basespd + growthvalues[hero.spdgrowth]}}
+              </div>
+              <div class="label">
+                Spd
+              </div>
+            </div>
+            <div class="orange statistic">
+              <div class="value">
+                {{ hero.maxdef || hero.basedef + growthvalues[hero.defgrowth]}}
+              </div>
+              <div class="label">
+                Def
+              </div>
+            </div>
+            <div class="blue statistic">
+              <div class="value">
+                {{ hero.maxres || hero.baseres + growthvalues[hero.resgrowth]}}
+              </div>
+              <div class="label">
+                Res
+              </div>
+            </div>
+          </div>
+          <div class="ui divider"></div>
+          <div>
+            <p>Current rank: {{ ranking }}</p>
+            <div class="eight icon ui buttons">
+              <button class="ui button"
+                      v-for="rank in rankings.slice(1,rankings.length)"
+                      v-on:click="addRank(hero.name, rankings.indexOf(rank))">
+                {{ rank }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Start of hero info -->
+
+      <div class="ui divider"></div>
+
+      <!-- Start of hero listing -->
+      <div class="ui form">
+        <!-- Filters -->
+        <div class="three fields">
+          <div class="field">
+            <label>Color</label>
+            <select v-model="selectedColor">
+              <option selected value="">All</option>
+              <option>Red</option>
+              <option>Blue</option>
+              <option>Green</option>
+              <option>Gray</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Weapon</label>
+            <select v-model="selectedWeapon">
+              <option selected value="">All</option>
+              <option>Sword</option>
+              <option>Lance</option>
+              <option>Axe</option>
+              <option>Red Tome</option>
+              <option>Blue Tome</option>
+              <option>Green Tome</option>
+              <option>Bow</option>
+              <option>Dagger</option>
+              <option>Staff</option>
+              <option>Breath</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Movement</label>
+            <select v-model="selectedMovement">
+              <option selected value="">All</option>
+              <option>Infantry</option>
+              <option>Cavalry</option>
+              <option>Flying</option>
+              <option>Armor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Hero List -->
+      <div style="height: 300px;" v-show="!importing && !exporting">
+        <div class="ui selection list" style="height: 100%; overflow-y: scroll;">
+          <div :name="unit.name" class="item" v-for="unit in hero_list" v-on:click.stop="selectHero(unit.name)">
+            <img class="ui avatar image" :src="'images/' + unit.name + '.png'">
+            <div class="content">
+              <div class="header">{{ unit.name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Export Field -->
+      <div style="height: 300px;" v-show="exporting">
+        <div class="ui form">
+          <div class="field">
+            <label>Copy text from here</label>
+            <textarea readonly rows="14"> {{ rankToText }}</textarea>
+          </div>
+        </div>
+      </div>
+      <!-- Import Field -->
+      <div style="height: 300px;" v-show="importing">
+        <div class="ui form">
+          <div class="field">
+            <label>Paste text here</label>
+            <textarea rows="14" @input="textToRank($event.target.value)"></textarea>
+          </div>
         </div>
       </div>
 
+      <div>
+        <label>Progress: {{ rankCount }}/{{ all_heroes.length }}</label>
+      </div>
+      <!-- End of hero listing -->
 
-  </body>
+      <div class="ui divider"></div>
 
-  <script src="hero_data.js"></script>
-  <script>
+      <!-- Start of action buttons -->
+      <div class="ui four buttons">
+        <button class="ui button" v-on:click="randomize()">
+          <i class="icon random"></i>
+          Randomize
+        </button>
+        <button class="ui button" v-on:click="reset()">
+          <i class="icon erase"></i>
+          Reset
+        </button>
+        <button class="ui button" v-if="!importing" v-on:click="importing = !importing; exporting = false">
+          <i class="icon paste"></i>
+          Import
+        </button>
+        <button class="ui button" v-else v-on:click="importing = false; exporting = false">
+          <i class="icon list"></i>
+          List
+        </button>
+        <button class="ui button" v-if="!exporting" v-on:click="exporting = !exporting; importing = false">
+          <i class="icon copy"></i>
+          Export
+        </button>
+        <button class="ui button" v-else v-on:click="importing = false; exporting = false">
+          <i class="icon list"></i>
+          List
+        </button>
+      </div>
+      <!-- End of action buttons -->
+
+    </div>
+    <!-- End of side bar -->
+
+    <!-- Start of Table -->
+    <div id="grid" class="twelve wide computer fourteen wide tablet column centered">
+      <table class="ui celled table center aligned" style="min-height: 900px;">
+        <thead>
+          <th>Rating</th>
+          <th v-for="weapon in weapontypes">
+            <img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img>
+          </th>
+        </thead>
+        <tbody>
+          <tr v-for="rank in rankings.slice(1,rankings.length).reverse()">
+            <td>{{rank}}</td>
+            <td v-for="weapon in weapontypes" :id="rank + '-' + weapon" style="padding: 0">
+                  <a href="#!" v-on:click="selectHero(unit.name)" v-for="unit in getRankedHeroes(weapon, rank)">
+                    <img :name="unit.name" style="width: 36px; height: 36px" :src="'images/' + unit.name + '.png'"></img>
+                  </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- End of Table -->
+
+</body>
+
+<script src="hero_data.js"></script>
+<script>
 heroes.forEach(function(hero) {
   hero.rating = 0
-    hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+"breath" : hero.weapontype
+  hero.weapontype = (hero.weapontype === 'dragon') ? hero.color+"breath" : hero.weapontype
 })
 heroes = heroes.filter(hero=> !hero.name.includes('generic'))
-
-$('.ui.modal').modal();
 
 new Vue({
   el: '#app',
@@ -270,7 +268,6 @@ new Vue({
       nextHeroListIndex = this.hero_list.map(hero => hero.name).indexOf(curHeroName)+1
       if (nextHeroListIndex >= this.hero_list.length) { nextHeroListIndex = 0 }
       nextHeroName = this.hero_list[nextHeroListIndex].name
-      console.log(nextHeroName)
       this.hero_index = this.all_heroes.map(hero => hero.name).indexOf(nextHeroName)
     },
     decrementIndex: function(event) {
@@ -291,19 +288,16 @@ new Vue({
     randomize: function() {
       length = this.rankings.length - 1
       this.all_heroes.forEach(function(hero) {
-      hero.rating = Math.floor(Math.random()*length)+1
+        hero.rating = Math.floor(Math.random()*length)+1
       })
     },
     reset: function (){
       this.all_heroes.forEach(function(hero) {
-      hero.rating = 0
+        hero.rating = 0
       })
     },
-    showImport: function (){
-      $('.ui.modal').modal('toggle')
-    },
     selectHero: function(name) {
-        this.hero_index = this.all_heroes.map(hero=>hero.name).indexOf(name)
+      this.hero_index = this.all_heroes.map(hero=>hero.name).indexOf(name)
     },
     textToRank: function (text) {
       try {
@@ -316,6 +310,5 @@ new Vue({
     }
   }
 })
-  </script>
-
+</script>
 </html>
