@@ -12,12 +12,20 @@
                          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
                          crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+  <script>
+    $(document).ready(function (event) {
+      $(window).scroll(function (event) {
+        $('.ui.sticky').css({paddingTop: $(document).scrollTop() + "px"})
+      });
+    });
+  </script>
 </head>
 
 <body>
   <div id="app" class="ui stackable grid" style="padding: 1em;">
     <!-- Start of sidebar -->
     <div id="hero-scroller" class="four wide computer fourteen wide tablet column centered" v-show="!expanded">
+      <div class="ui sticky" style="transition: padding 0.2s linear;">
       <div id="hero-panel" class="ui center aligned header">
         <div class="ui header">FEH Tier List Generator</div>
         <div>
@@ -191,6 +199,7 @@
       </div>
       <!-- End of action buttons -->
 
+    </div>
     </div>
     <!-- End of side bar -->
 
