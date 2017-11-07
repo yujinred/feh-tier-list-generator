@@ -197,8 +197,13 @@
     <div id="grid" class="column centered" :class="!expanded ? 'twelve wide computer fourteen wide tablet' : 'sixteen wide computer sixteen wide tablet'">
       <table class="ui celled table center aligned" style="min-height: 900px;">
         <thead>
-          <th>Rating<br><a v-on:click="expanded = !expanded" href="#"><i :class="!expanded ? 'expand icon' : 'compress icon'"></i></a></th>
-          <th v-for="weapon in weapontypes">
+          <th :style="evenwidth ? 'width: calc(100% / 13)' : ''">
+            <div class="ui small basic icon buttons">
+              <button class="ui button" data-tooltip="Toggle fullscreen mode" data-position="bottom center" v-on:click="expanded = !expanded"><i :class="!expanded ? 'expand icon' : 'compress icon'"></i></button>
+              <button class="ui button" data-tooltip="Toggle column width" data-position="bottom center" v-on:click="evenwidth = !evenwidth"><i :class="!evenwidth ? 'resize horizontal icon' : 'resize vertical icon'"></i></button>
+            </div>
+          </th>
+          <th :style="evenwidth ? 'width: calc(100% / 13)' : ''" v-for="weapon in weapontypes">
             <img style="width: 32px; height: 32px" :src="'weapontypes/' + weapon + '.png'"></img>
           </th>
         </thead>
@@ -240,6 +245,7 @@ new Vue({
     importing: false,
     exporting: false,
     expanded: false,
+    evenwidth: false,
   },
   computed: {
     hero: function () {
