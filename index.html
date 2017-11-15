@@ -90,7 +90,7 @@
               </select>
               
             </div>
-            <button class="ui button" v-on:click="addTier(tierToAdd, parentTier)">Add New Tier After {{ parentTier }}</button>
+            <button class="ui button" v-on:click="addTier(tierToAdd, parentTier)">Add New Tier Above {{ parentTier }}</button>
 
             <div class="ui hidden divider"></div>
             <!-- End of Add New Tier -->
@@ -102,6 +102,7 @@
             </select>
             </div>
             <button class="ui button" v-on:click="deleteTier(tierToDelete)">Delete Tier {{ tierToDelete }}</button>
+            <button class="ui button" v-on:click="deleteAllTiers()">Delete All Tiers</button>
             <!-- End of Delete Tier -->
           </div>
         </div>
@@ -352,7 +353,7 @@ new Vue({
           }
           ratings = ratings.slice(1);
         } else {
-          this.rankings = this.originalRankings;
+          this._resetRanking();
         }
         
         ratings.forEach(rate => { this.all_heroes.find(hero=> hero.name == rate.name).rating = rate.rating })
@@ -365,17 +366,24 @@ new Vue({
       if (this.rankings.indexOf(tierToAdd) !== -1) return;
       if (tierToAdd === "") return;
 
-      var parentIndex = this.rankings.indexOf(parentTier) + 1;
-      this.rankings.splice(parentIndex, 0, tierToAdd);
+      var parentIndex = this.rankings.indexOf(parentTier);
+      this.rankings.splice(parentIndex + 1, 0, tierToAdd);
+      // make sure that heroes tiers are keep the same as before with the new tier added in
+      this.all_heroes.filter(hero=> hero.rating > parentIndex).forEach(hero => hero.rating++);
     },
-
     deleteTier: function (tierToDelete) {
       var tierIndex = this.rankings.indexOf(tierToDelete);
 
       if (tierIndex !== -1) {
+        // reset all heroes in this tier back to unranked
+        this.all_heroes.filter(hero => hero.rating === tierIndex).forEach(hero => hero.rating = 0);
         this.rankings.splice(tierIndex, 1);
       }
 
+    },
+    deleteAllTiers: function () {
+      this.reset();
+      this.rankings = ['Unranked'];
     },
     _isRankingAltered: function (newRanking) {
       var rankingChanged = false;
@@ -390,6 +398,9 @@ new Vue({
         }
       }
       return rankingChanged;
+    },
+    _resetRanking: function () {
+      this.rankings = this.originalRankings;
     }
   }
 })
