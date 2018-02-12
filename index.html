@@ -83,27 +83,31 @@
                 {{ rank }}</button>
             </div>
             <!-- Start of Add New Tier-->
-            <div class="ui action input" style="width: 100%">
-              <input type="text" placeholder="eg. EX" v-model="tierToAdd">
-              <select class="ui compact selection dropdown" v-model="parentTier">
-                <option v-for="rank in rankings">{{ rank }}</option>
+            <button class="ui button" v-on:click="editTiers=!editTiers">Customize Tiers</button>
+            <div v-if="editTiers">
+              <div class="ui hidden divider"></div>
+              <div class="ui action input" style="width: 100%">
+                <input type="text" placeholder="eg. EX" v-model="tierToAdd">
+                <select class="ui compact selection dropdown" v-model="parentTier">
+                  <option v-for="rank in rankings">{{ rank }}</option>
+                </select>
+                
+              </div>
+              <button class="ui button" v-on:click="addTier(tierToAdd, parentTier)">Add New Tier Above {{ parentTier }}</button>
+
+              <div class="ui hidden divider"></div>
+              <!-- End of Add New Tier -->
+
+              <!-- Start of Delete Tier -->
+              <div class="ui" style="width: 100%">
+              <select class="ui fluid dropdown" v-model="tierToDelete">
+                <option v-for="rank in rankings.slice(1,rankings.length)">{{ rank }}</option>
               </select>
-              
+              </div>
+              <button class="ui button" v-on:click="deleteTier(tierToDelete)">Delete Tier {{ tierToDelete }}</button>
+              <button class="ui button" v-on:click="deleteAllTiers()">Delete All Tiers</button>
+              <!-- End of Delete Tier -->
             </div>
-            <button class="ui button" v-on:click="addTier(tierToAdd, parentTier)">Add New Tier Above {{ parentTier }}</button>
-
-            <div class="ui hidden divider"></div>
-            <!-- End of Add New Tier -->
-
-            <!-- Start of Delete Tier -->
-            <div class="ui" style="width: 100%">
-            <select class="ui fluid dropdown" v-model="tierToDelete">
-              <option v-for="rank in rankings.slice(1,rankings.length)">{{ rank }}</option>
-            </select>
-            </div>
-            <button class="ui button" v-on:click="deleteTier(tierToDelete)">Delete Tier {{ tierToDelete }}</button>
-            <button class="ui button" v-on:click="deleteAllTiers()">Delete All Tiers</button>
-            <!-- End of Delete Tier -->
           </div>
         </div>
       </div>
@@ -114,6 +118,14 @@
       <!-- Start of hero listing -->
       <div class="ui form">
         <!-- Filters -->
+        <div class="one field">
+          <div class="field">
+            <label>Search (Beta)</label>
+            <input type="text" v-model="searchFilter" v-on:input="resetIndex">
+            </input>
+          </div>
+
+        </div>
         <div class="three fields">
           <div class="field">
             <label>Color</label>
@@ -265,11 +277,12 @@ new Vue({
   data: {
     all_heroes: heroes,
     hero_index: Math.floor(Math.random()*heroes.length),
-    originalRankings: ['Unranked', 'D', 'C', 'B', 'A', 'A+', 'S-', 'S', 'S+'],
-    rankings: ['Unranked', 'D', 'C', 'B', 'A', 'A+', 'S-', 'S', 'S+'],
+    originalRankings: ['Unranked', 'C', 'B', 'A', 'A+', 'S-', 'S', 'S+'],
+    rankings: ['Unranked', 'C', 'B', 'A', 'A+', 'S-', 'S', 'S+'],
     weapontypes: ['sword', 'redtome', 'redbreath', 'lance', 'bluetome', 'bluebreath', 'axe', 'greentome', 'greenbreath', 'bow', 'dagger', 'staff'],
     growthvalues: [8,10,13,15,17,19,22,24,26,28,30,33,35,37],
     selectedColor: "",
+    searchFilter: "",
     selectedWeapon: "",
     selectedMovement: "",
     parentTier: "S+",
@@ -279,6 +292,7 @@ new Vue({
     exporting: false,
     expanded: false,
     evenwidth: false,
+    editTiers: false,
   },
   computed: {
     hero: function () {
@@ -292,6 +306,7 @@ new Vue({
     },
     hero_list: function() {
       return this.all_heroes
+        .filter(hero => hero.name.toLowerCase().includes(this.searchFilter.toLowerCase()))
         .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
         .filter(hero => hero.weapontype.includes(this.selectedWeapon.replace(/\s+/g, '').toLowerCase()))
         .filter(hero => hero.movetype.includes(this.selectedMovement.toLowerCase()))
@@ -304,6 +319,10 @@ new Vue({
     },
   },
   methods: {
+    resetIndex: function() {
+        this.incrementIndex()
+        this.decrementIndex()
+    },
     incrementIndex: function(event) {
       if(this.hero_list.length == 0) return
       curHeroName = this.all_heroes[this.hero_index].name
