@@ -396,9 +396,9 @@ new Vue({
       if (tierIndex !== -1) {
         // reset all heroes in this tier back to unranked
         this.all_heroes.filter(hero => hero.rating === tierIndex).forEach(hero => hero.rating = 0);
+        this.all_heroes.filter(hero => hero.rating > tierIndex).forEach(hero => hero.rating--);
         this.rankings.splice(tierIndex, 1);
       }
-
     },
     deleteAllTiers: function () {
       this.reset();
