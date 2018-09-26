@@ -163,6 +163,14 @@
               <option>Armor</option>
             </select>
           </div>
+          <div class="field">
+            <label>Gender</label>
+            <select v-model="selectedGender">
+              <option selected value="">All</option>
+              <option>Boy</option>
+              <option>Girl</option>
+            </select>
+          </div>
         </div>
       </div>
       <!-- Hero List -->
@@ -285,6 +293,7 @@ new Vue({
     searchFilter: "",
     selectedWeapon: "",
     selectedMovement: "",
+    selectedGender: "",
     parentTier: "S+",
     tierToDelete: "",
     tierToAdd: "",
@@ -310,6 +319,7 @@ new Vue({
         .filter(hero => hero.color.includes(this.selectedColor.toLowerCase()))
         .filter(hero => hero.weapontype.includes(this.selectedWeapon.replace(/\s+/g, '').toLowerCase()))
         .filter(hero => hero.movetype.includes(this.selectedMovement.toLowerCase()))
+        .filter(hero => hero.gender.includes(this.selectedGender.toLowerCase()))
         .filter(hero => hero.rating == 0)
     },
     rankToText: function () {
